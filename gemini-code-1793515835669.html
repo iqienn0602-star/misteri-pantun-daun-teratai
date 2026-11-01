@@ -1,0 +1,1445 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Lompatan Detektif: Kolam Teratai Ajaib | Akademi Pantun Didi & Friends</title>
+  <style>
+    :root {
+      --sky-blue: #BFE9FF;
+      --mint-green: #C9F4DF;
+      --leaf-green: #83D6A5;
+      --soft-yellow: #FFF0A8;
+      --coral-pink: #FFB8B0;
+      --cream: #FFFAF0;
+      --dark-text: #28445B;
+      --gold: #FFD700;
+      --shadow-color: rgba(40, 68, 91, 0.15);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Fredoka', 'Quicksand', 'Comic Sans MS', sans-serif;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: var(--sky-blue);
+      color: var(--dark-text);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 12px;
+      overflow-x: hidden;
+    }
+
+    #game-container {
+      background: linear-gradient(180deg, #d8f3fe 0%, #b8ebfc 40%, #95dff5 100%);
+      width: 100%;
+      max-width: 900px;
+      min-height: 640px;
+      border-radius: 28px;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.2), inset 0 0 15px rgba(255, 255, 255, 0.6);
+      border: 8px solid white;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .pond-bg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .firefly {
+      position: absolute;
+      width: 6px;
+      height: 6px;
+      background: #FFF;
+      box-shadow: 0 0 10px #FFFAA0, 0 0 18px var(--gold);
+      border-radius: 50%;
+      animation: floatFirefly 7s infinite ease-in-out alternate;
+    }
+
+    @keyframes floatFirefly {
+      0% { transform: translateY(0) translateX(0); opacity: 0.2; }
+      50% { opacity: 0.9; }
+      100% { transform: translateY(-70px) translateX(40px); opacity: 0.3; }
+    }
+
+    .water-ripple {
+      position: absolute;
+      border: 2px solid rgba(255, 255, 255, 0.4);
+      border-radius: 50%;
+      animation: ripple 6s infinite linear;
+      pointer-events: none;
+    }
+
+    @keyframes ripple {
+      0% { width: 10px; height: 10px; opacity: 0.8; transform: translate(-50%, -50%); }
+      100% { width: 220px; height: 110px; opacity: 0; transform: translate(-50%, -50%); }
+    }
+
+    header {
+      z-index: 10;
+      background: rgba(255, 250, 240, 0.9);
+      backdrop-filter: blur(8px);
+      padding: 10px 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 3px solid var(--mint-green);
+      box-shadow: 0 4px 10px var(--shadow-color);
+    }
+
+    .status-badge {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: white;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-weight: 700;
+      font-size: 15px;
+      border: 2px solid var(--leaf-green);
+      color: var(--dark-text);
+    }
+
+    .progress-bar-wrap {
+      flex: 1;
+      max-width: 240px;
+      background: #e2e8f0;
+      height: 14px;
+      border-radius: 20px;
+      margin: 0 14px;
+      overflow: hidden;
+      border: 2px solid white;
+    }
+
+    .progress-bar-fill {
+      background: linear-gradient(90deg, var(--leaf-green), #48bb78);
+      height: 100%;
+      width: 0%;
+      transition: width 0.5s ease;
+    }
+
+    main {
+      flex: 1;
+      z-index: 5;
+      display: flex;
+      flex-direction: column;
+      padding: 18px;
+      position: relative;
+    }
+
+    .screen {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 100%;
+      animation: fadeIn 0.4s ease forwards;
+    }
+
+    .screen.active {
+      display: flex;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .btn {
+      background: var(--coral-pink);
+      color: white;
+      border: none;
+      padding: 14px 28px;
+      font-size: 18px;
+      font-weight: bold;
+      border-radius: 30px;
+      cursor: pointer;
+      box-shadow: 0 6px 0 #e27d73, 0 10px 15px rgba(0,0,0,0.15);
+      transition: all 0.15s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 15px;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 0 #e27d73, 0 12px 18px rgba(0,0,0,0.2);
+    }
+
+    .btn:active {
+      transform: translateY(4px);
+      box-shadow: 0 2px 0 #e27d73;
+    }
+
+    .btn-secondary {
+      background: var(--leaf-green);
+      box-shadow: 0 6px 0 #57ab79, 0 10px 15px rgba(0,0,0,0.15);
+    }
+    .btn-secondary:hover { box-shadow: 0 8px 0 #57ab79; }
+    .btn-secondary:active { box-shadow: 0 2px 0 #57ab79; }
+
+    .frog-avatar {
+      width: 64px;
+      height: 64px;
+      background: #7bd389;
+      border-radius: 50%;
+      position: relative;
+      border: 3px solid #2e7d32;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+      animation: frogBreathe 2.5s infinite ease-in-out;
+      flex-shrink: 0;
+    }
+
+    .frog-eye {
+      position: absolute;
+      top: -8px;
+      width: 22px;
+      height: 22px;
+      background: white;
+      border: 3px solid #2e7d32;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .frog-eye.left { left: 4px; }
+    .frog-eye.right { right: 4px; }
+    .frog-pupil {
+      width: 9px;
+      height: 9px;
+      background: #111;
+      border-radius: 50%;
+      transition: transform 0.2s;
+    }
+
+    .frog-mouth {
+      position: absolute;
+      bottom: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 24px;
+      height: 10px;
+      border-bottom: 3px solid #2e7d32;
+      border-radius: 0 0 15px 15px;
+      transition: all 0.2s;
+    }
+
+    .frog-blush {
+      position: absolute;
+      bottom: 16px;
+      width: 10px;
+      height: 6px;
+      background: var(--coral-pink);
+      border-radius: 50%;
+      opacity: 0.8;
+    }
+    .frog-blush.left { left: 8px; }
+    .frog-blush.right { right: 8px; }
+
+    .frog-avatar.happy .frog-mouth {
+      height: 14px;
+      background: #c62828;
+      border-radius: 0 0 16px 16px;
+    }
+    .frog-avatar.thinking .frog-pupil { transform: translateY(-3px); }
+    .frog-avatar.thinking .frog-mouth {
+      width: 14px;
+      height: 3px;
+      border-radius: 2px;
+      background: #2e7d32;
+    }
+
+    @keyframes frogBreathe {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.04); }
+    }
+
+    .pond-map {
+      width: 100%;
+      max-width: 760px;
+      height: 380px;
+      position: relative;
+      margin: 10px auto;
+      background: radial-gradient(ellipse at center, rgba(191, 233, 255, 0.4) 0%, rgba(131, 214, 165, 0.2) 80%);
+      border-radius: 20px;
+    }
+
+    .lotus-leaf {
+      position: absolute;
+      width: 68px;
+      height: 62px;
+      background: var(--leaf-green);
+      border-radius: 50% 50% 45% 45%;
+      border: 3px solid #3c8d5a;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      color: white;
+      cursor: pointer;
+      box-shadow: 0 6px 12px rgba(0,0,0,0.15), inset 0 3px 6px rgba(255,255,255,0.4);
+      transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s;
+      transform: translate(-50%, -50%);
+    }
+
+    .lotus-leaf::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      width: 3px;
+      height: 22px;
+      background: #3c8d5a;
+      clip-path: polygon(0 0, 100% 0, 50% 100%);
+    }
+
+    .lotus-leaf .leaf-num {
+      font-size: 19px;
+      z-index: 2;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.4);
+    }
+    .lotus-leaf .leaf-title {
+      font-size: 8px;
+      z-index: 2;
+      text-align: center;
+      white-space: nowrap;
+      margin-top: 1px;
+      color: #FFF;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.6);
+    }
+
+    .lotus-leaf.locked {
+      background: #a0aec0;
+      border-color: #718096;
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+    .lotus-leaf.active-leaf {
+      border: 4px solid var(--gold);
+      box-shadow: 0 0 20px var(--gold), 0 8px 14px rgba(0,0,0,0.25);
+      animation: pulseLeaf 1.6s infinite alternate;
+    }
+    .lotus-leaf.completed {
+      background: #38b2ac;
+      border-color: #234e52;
+    }
+    .lotus-leaf.completed::before {
+      content: '✓';
+      position: absolute;
+      top: -6px;
+      right: -6px;
+      background: var(--gold);
+      color: #28445B;
+      border-radius: 50%;
+      width: 22px;
+      height: 22px;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+
+    @keyframes pulseLeaf {
+      0% { transform: translate(-50%, -50%) scale(1); }
+      100% { transform: translate(-50%, -50%) scale(1.12); }
+    }
+
+    #frog-character {
+      position: absolute;
+      z-index: 20;
+      transition: left 0.7s cubic-bezier(0.68, -0.55, 0.265, 1.55), top 0.7s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+      transform: translate(-50%, -85%);
+      pointer-events: none;
+    }
+
+    .challenge-card {
+      background: var(--cream);
+      width: 100%;
+      max-width: 780px;
+      border-radius: 22px;
+      padding: 20px 24px;
+      box-shadow: 0 10px 25px var(--shadow-color);
+      border: 3px solid white;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      position: relative;
+    }
+
+    .challenge-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 2px dashed #cbd5e0;
+      padding-bottom: 10px;
+    }
+
+    .challenge-badge {
+      background: var(--soft-yellow);
+      padding: 6px 14px;
+      border-radius: 14px;
+      font-weight: 700;
+      color: #805b00;
+      font-size: 14px;
+    }
+
+    .instruction-text {
+      font-size: 17px;
+      font-weight: 600;
+      color: var(--dark-text);
+      line-height: 1.4;
+    }
+
+    .pantun-display-box {
+      background: white;
+      padding: 14px 20px;
+      border-radius: 14px;
+      border-left: 6px solid var(--leaf-green);
+      font-size: 16px;
+      line-height: 1.8;
+      font-style: italic;
+      color: #2d3748;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.03);
+    }
+
+    .options-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    @media (max-width: 600px) {
+      .options-grid { grid-template-columns: 1fr; }
+    }
+
+    .opt-card {
+      background: white;
+      border: 3px solid #e2e8f0;
+      border-radius: 14px;
+      padding: 14px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-align: left;
+    }
+    .opt-card:hover {
+      border-color: var(--sky-blue);
+      background: #f7fafc;
+      transform: translateY(-2px);
+    }
+    .opt-card.selected {
+      border-color: var(--coral-pink);
+      background: #fff5f5;
+    }
+    .opt-card.correct {
+      border-color: #48bb78 !important;
+      background: #f0fff4 !important;
+      color: #22543d;
+    }
+    .opt-card.wrong {
+      border-color: #f56565 !important;
+      background: #fff5f5 !important;
+      animation: shake 0.4s ease;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-8px); }
+      40%, 80% { transform: translateX(8px); }
+    }
+
+    .bridge-match-container {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      margin: 10px 0;
+    }
+    .match-col {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .match-btn {
+      background: white;
+      border: 2px solid #cbd5e0;
+      padding: 12px;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .match-btn.active-match {
+      border-color: var(--coral-pink);
+      background: var(--soft-yellow);
+    }
+    .match-btn.done {
+      background: #c6f6d5;
+      border-color: #38a169;
+      color: #22543d;
+      pointer-events: none;
+    }
+
+    .classification-zones {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin: 10px 0;
+    }
+    .class-zone {
+      background: white;
+      border: 3px dashed #cbd5e0;
+      border-radius: 14px;
+      padding: 12px;
+      min-height: 130px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .class-zone h4 {
+      text-align: center;
+      font-size: 15px;
+      padding-bottom: 6px;
+      border-bottom: 2px solid var(--soft-yellow);
+    }
+    .draggable-card {
+      background: var(--mint-green);
+      border: 2px solid #9ae6b4;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 14px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+
+    .slot-box {
+      display: inline-block;
+      min-width: 170px;
+      height: 34px;
+      border-bottom: 3px dashed var(--coral-pink);
+      background: rgba(255, 240, 168, 0.4);
+      border-radius: 6px;
+      vertical-align: middle;
+      text-align: center;
+      line-height: 32px;
+      font-weight: bold;
+      color: #c53030;
+      cursor: pointer;
+      padding: 0 8px;
+    }
+
+    .feedback-bubble {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: white;
+      padding: 12px 18px;
+      border-radius: 16px;
+      border-left: 6px solid var(--leaf-green);
+      margin-top: 8px;
+      font-size: 15px;
+      line-height: 1.4;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    }
+    .feedback-bubble.error {
+      border-left-color: #f56565;
+      background: #fffafa;
+    }
+
+    .victory-box {
+      text-align: center;
+      background: white;
+      border-radius: 28px;
+      padding: 30px;
+      max-width: 600px;
+      border: 4px solid var(--gold);
+      box-shadow: 0 16px 30px rgba(0,0,0,0.15);
+      position: relative;
+    }
+    .badge-icon {
+      font-size: 70px;
+      animation: bounce 1.8s infinite;
+      margin-bottom: 10px;
+    }
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-16px); }
+    }
+
+    @media (max-width: 768px) {
+      #game-container { min-height: 600px; border-radius: 16px; border-width: 4px; }
+      .pond-map { height: 350px; }
+      .lotus-leaf { width: 56px; height: 52px; }
+      .lotus-leaf .leaf-num { font-size: 16px; }
+      .lotus-leaf .leaf-title { font-size: 7px; }
+      .challenge-card { padding: 14px 16px; }
+      .instruction-text { font-size: 15px; }
+      .opt-card { font-size: 14px; padding: 10px; }
+      .classification-zones { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="game-container">
+  <div class="pond-bg">
+    <div class="water-ripple" style="top: 25%; left: 30%;"></div>
+    <div class="water-ripple" style="top: 75%; left: 70%; animation-delay: 3s;"></div>
+    <div class="firefly" style="top: 20%; left: 15%;"></div>
+    <div class="firefly" style="top: 60%; left: 80%; animation-delay: 2s;"></div>
+    <div class="firefly" style="top: 40%; left: 50%; animation-delay: 4s;"></div>
+  </div>
+
+  <header>
+    <div class="status-badge">
+      <span>🏆 Markah:</span>
+      <span id="score-val" style="color: #e53e3e;">0 / 80</span>
+    </div>
+    <div class="progress-bar-wrap">
+      <div id="progress-fill" class="progress-bar-fill"></div>
+    </div>
+    <div class="status-badge">
+      <span>Daun:</span>
+      <span id="progress-count">0 / 8</span>
+    </div>
+  </header>
+
+  <main>
+    <section id="screen-home" class="screen active">
+      <div style="background: rgba(255,255,255,0.92); border-radius: 24px; padding: 26px; max-width: 650px; text-align: center; border: 4px solid var(--leaf-green); box-shadow: 0 12px 28px rgba(0,0,0,0.1);">
+        <p style="font-size: 13px; font-weight: bold; color: #4a5568; letter-spacing: 1px;">AKADEMI PANTUN DIDI & FRIENDS</p>
+        <p style="font-size: 12px; font-weight: bold; color: var(--coral-pink); margin-bottom: 6px;">MISI DETEKTIF CILIK: MISTERI PANTUN (AKTIVITI 05)</p>
+        <h1 style="color: var(--dark-text); font-size: 27px; margin-bottom: 14px;">🐸 Lompatan Detektif: Kolam Teratai Ajaib</h1>
+        
+        <div style="display: flex; justify-content: center; margin: 15px 0;">
+          <div class="frog-avatar happy">
+            <div class="frog-eye left"><div class="frog-pupil"></div></div>
+            <div class="frog-eye right"><div class="frog-pupil"></div></div>
+            <div class="frog-mouth"></div>
+            <div class="frog-blush left"></div>
+            <div class="frog-blush right"></div>
+          </div>
+        </div>
+
+        <p style="font-size: 16px; line-height: 1.6; color: #4a5568; margin-bottom: 15px;">
+          “Selamat datang, Detektif Cilik!<br>
+          Lapan daun teratai menyimpan lapan cabaran misteri tentang <strong>pantun empat kerat</strong>. Selesaikan semua cabaran, kumpulkan mata dan buka <strong>Peti Pantun Warisan</strong> di seberang kolam!”
+        </p>
+
+        <button class="btn" onclick="startAdventure()">MULA MISI 🚀</button>
+      </div>
+    </section>
+
+    <section id="screen-map" class="screen">
+      <div style="width: 100%; display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; padding: 0 10px;">
+        <h3 style="font-size: 18px; color: var(--dark-text);">🗺️ Laluan Daun Teratai Ajaib</h3>
+        <span style="font-size: 13px; font-weight: bold; background: white; padding: 4px 10px; border-radius: 12px;">Pilih daun aktif untuk melompat</span>
+      </div>
+
+      <div class="pond-map" id="pond-map">
+        <div id="frog-character">
+          <div class="frog-avatar" id="map-frog">
+            <div class="frog-eye left"><div class="frog-pupil"></div></div>
+            <div class="frog-eye right"><div class="frog-pupil"></div></div>
+            <div class="frog-mouth"></div>
+            <div class="frog-blush left"></div>
+            <div class="frog-blush right"></div>
+          </div>
+        </div>
+
+        <div class="lotus-leaf active-leaf" id="leaf-1" style="top: 80%; left: 14%;" onclick="openChallenge(1)">
+          <span class="leaf-num">1</span>
+          <span class="leaf-title">Kenali Pantun</span>
+        </div>
+        <div class="lotus-leaf locked" id="leaf-2" style="top: 55%; left: 24%;" onclick="openChallenge(2)">
+          <span class="leaf-num">2</span>
+          <span class="leaf-title">Pembayang</span>
+        </div>
+        <div class="lotus-leaf locked" id="leaf-3" style="top: 75%; left: 38%;" onclick="openChallenge(3)">
+          <span class="leaf-num">3</span>
+          <span class="leaf-title">Jambatan Rima</span>
+        </div>
+        <div class="lotus-leaf locked" id="leaf-4" style="top: 45%; left: 50%;" onclick="openChallenge(4)">
+          <span class="leaf-num">4</span>
+          <span class="leaf-title">Pengelasan</span>
+        </div>
+        <div class="lotus-leaf locked" id="leaf-5" style="top: 75%; left: 62%;" onclick="openChallenge(5)">
+          <span class="leaf-num">5</span>
+          <span class="leaf-title">Hilang Baris</span>
+        </div>
+        <div class="lotus-leaf locked" id="leaf-6" style="top: 45%; left: 74%;" onclick="openChallenge(6)">
+          <span class="leaf-num">6</span>
+          <span class="leaf-title">Pola Rima</span>
+        </div>
+        <div class="lotus-leaf locked" id="leaf-7" style="top: 75%; left: 86%;" onclick="openChallenge(7)">
+          <span class="leaf-num">7</span>
+          <span class="leaf-title">Cari Maksud</span>
+        </div>
+        <div class="lotus-leaf locked" id="leaf-8" style="top: 25%; left: 88%;" onclick="openChallenge(8)">
+          <span class="leaf-num">8</span>
+          <span class="leaf-title">Susun Pantun</span>
+        </div>
+      </div>
+
+      <div style="margin-top: 10px;">
+        <button id="btn-resume" class="btn btn-secondary" onclick="openCurrentChallenge()">TERUSKAN CABARAN SEMASA ➡️</button>
+      </div>
+    </section>
+
+    <section id="screen-challenge" class="screen">
+      <div class="challenge-card">
+        <div class="challenge-header">
+          <div>
+            <span class="challenge-badge" id="c-badge">Daun Teratai 1</span>
+            <h2 id="c-title" style="font-size: 20px; color: var(--dark-text); margin-top: 4px;">Kenali Pantun</h2>
+          </div>
+          <div class="frog-avatar thinking" id="c-frog">
+            <div class="frog-eye left"><div class="frog-pupil"></div></div>
+            <div class="frog-eye right"><div class="frog-pupil"></div></div>
+            <div class="frog-mouth"></div>
+            <div class="frog-blush left"></div>
+            <div class="frog-blush right"></div>
+          </div>
+        </div>
+
+        <p class="instruction-text" id="c-instruction">Arahan soalan dipaparkan di sini.</p>
+        <div id="c-pantun-box" class="pantun-display-box" style="display: none;"></div>
+        <div id="c-interactive-area" style="min-height: 120px;"></div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 4px;">
+          <button id="btn-check" class="btn" onclick="verifyAnswer()" style="margin: 0; display: none;">SEMAK JAWAPAN ✔️</button>
+          <button id="btn-next" class="btn btn-secondary" onclick="completeAndReturn()" style="margin: 0; display: none;">LOMPAT KE DAUN SETERUSNYA 🌿</button>
+        </div>
+
+        <div id="c-feedback" class="feedback-bubble" style="display: none;">
+          <span id="fb-icon" style="font-size: 24px;">💡</span>
+          <span id="fb-text">Petunjuk atau maklum balas dipaparkan di sini.</span>
+        </div>
+      </div>
+    </section>
+
+    <section id="screen-end" class="screen">
+      <div class="victory-box">
+        <div class="badge-icon">🎖️</div>
+        <h2 style="color: var(--coral-pink); font-size: 26px;">TAHNIAH, DETEKTIF CILIK!</h2>
+        <p style="font-size: 17px; margin: 12px 0; color: #2d3748; line-height: 1.5;">
+          “Kamu berjaya merentasi <strong>Kolam Teratai Ajaib</strong> dan membuka <strong>Peti Pantun Warisan</strong>!”
+        </p>
+
+        <div style="background: var(--soft-yellow); padding: 14px; border-radius: 14px; margin: 16px 0; text-align: left;">
+          <h4 style="color: #744210; margin-bottom: 6px;">🎓 Rumusan Kejayaan Pembelajaran:</h4>
+          <ul style="font-size: 14px; color: #4a5568; padding-left: 20px; line-height: 1.6;">
+            <li>Mengenal pasti bilangan 4 baris pantun empat kerat.</li>
+            <li>Membezakan dua baris pembayang dan dua baris maksud.</li>
+            <li>Memadankan pasangan rima akhir perkataan.</li>
+            <li>Mengenal pasti pola rima akhir berangkap ABAB.</li>
+            <li>Melengkapkan dan menyusun baris pantun secara gramatis.</li>
+          </ul>
+        </div>
+
+        <div style="font-size: 20px; font-weight: bold; margin: 14px 0; color: #22543d;">
+          Markah Penuh: <span id="final-score" style="color: #e53e3e;">80</span> / 80
+        </div>
+
+        <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+          <button class="btn" onclick="restartGame()">MAIN SEMULA 🔄</button>
+          <button class="btn btn-secondary" onclick="returnToAdventureMap()">KEMBALI KE PETA PENGEMBARAAN 🗺️</button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script>
+  let currentLevel = 1;
+  let totalScore = 0;
+  const completedLevels = new Set();
+
+  const leafCoordinates = {
+    1: { top: '80%', left: '14%' },
+    2: { top: '55%', left: '24%' },
+    3: { top: '75%', left: '38%' },
+    4: { top: '45%', left: '50%' },
+    5: { top: '75%', left: '62%' },
+    6: { top: '45%', left: '74%' },
+    7: { top: '75%', left: '86%' },
+    8: { top: '25%', left: '88%' }
+  };
+
+  const challenges = [
+    {
+      id: 1,
+      title: "Kenali Pantun",
+      badge: "Daun Teratai 1",
+      instruction: "Sebelum memulakan perjalanan, buktikan bahawa kamu mengenali pantun empat kerat!",
+      pantun: "",
+      type: "mcq",
+      question: "Berapakah bilangan baris dalam satu rangkap pantun empat kerat?",
+      options: [
+        { text: "A. Dua baris", correct: false },
+        { text: "B. Tiga baris", correct: false },
+        { text: "C. Empat baris", correct: true },
+        { text: "D. Enam baris", correct: false }
+      ],
+      correctFeedback: "Hebat! Pantun empat kerat mempunyai empat baris dalam satu rangkap.",
+      hint: "Cuba ingat semula nama pantun empat kerat!"
+    },
+    {
+      id: 2,
+      title: "Rahsia Pembayang",
+      badge: "Daun Teratai 2",
+      instruction: "Baris pantun telah bercampur! Pilih dua baris pertama yang membentuk pembayang pantun.",
+      pantun: "",
+      type: "multi_select",
+      question: "Yang manakah merupakan pembayang bagi pantun berikut? (Pilih tepat DUA baris)",
+      options: [
+        { id: "A", text: "A. Burung merpati terbang ke desa,", isPembayang: true },
+        { id: "B", text: "B. Rajin belajar sepanjang masa,", isPembayang: false },
+        { id: "C", text: "C. Hinggap sebentar di pohon jati;", isPembayang: true },
+        { id: "D", text: "D. Ilmu menjadi bekal sejati.", isPembayang: false }
+      ],
+      correctFeedback: "Tepat sekali! Kamu berjaya menemukan kedua-dua baris pembayang (Baris 1 & 2).",
+      hint: "Pembayang berada pada dua baris pertama pantun."
+    },
+    {
+      id: 3,
+      title: "Jambatan Rima",
+      badge: "Daun Teratai 3",
+      instruction: "Bunyi ajaib telah menghilangkan jambatan! Padankan perkataan yang mempunyai rima akhir yang sesuai supaya jambatan dapat dibina semula.",
+      pantun: "",
+      type: "matching",
+      leftWords: ["Desa", "Jati", "Pagi", "Bunga"],
+      rightWords: ["Sejati", "Masa", "Juga", "Hati"],
+      pairs: { "Desa": "Masa", "Jati": "Sejati", "Pagi": "Hati", "Bunga": "Juga" },
+      correctFeedback: "Hebat! Kamu berjaya menemukan pasangan rima dan membina semula jambatan!",
+      hint: "Sebut kedua-dua perkataan dengan kuat dan dengar bunyi pada hujungnya."
+    },
+    {
+      id: 4,
+      title: "Pembayang atau Maksud?",
+      badge: "Daun Teratai 4",
+      instruction: "Asingkan baris pantun kepada dua kumpulan: Pembayang dan Maksud.",
+      pantun: "",
+      type: "classify",
+      cards: [
+        { id: 1, text: "Burung merpati terbang ke desa,", type: "pembayang" },
+        { id: 2, text: "Hinggap sebentar di pohon jati;", type: "pembayang" },
+        { id: 3, text: "Rajin belajar sepanjang masa,", type: "maksud" },
+        { id: 4, text: "Ilmu menjadi bekal sejati.", type: "maksud" }
+      ],
+      correctFeedback: "Syabas! Kamu berjaya membezakan pembayang dan maksud pantun.",
+      hint: "Dua baris pertama ialah pembayang. Dua baris terakhir ialah maksud."
+    },
+    {
+      id: 5,
+      title: "Pantun Hilang Dua Baris",
+      badge: "Daun Teratai 5",
+      instruction: "Hujan ajaib telah memadamkan dua baris pantun! Pilih dua baris yang betul untuk memulihkannya.",
+      pantun: "Burung merpati terbang ke desa,<br>Hinggap sebentar di pohon jati;<br><span id='slot-3' class='slot-box' onclick='removeFromSlot(3)'>[Tekan Pilihan 1]</span> sepanjang masa,<br><span id='slot-4' class='slot-box' onclick='removeFromSlot(4)'>[Tekan Pilihan 2]</span> bekal sejati.",
+      type: "fill_blank",
+      choices: [
+        { text: "Rajin belajar", target: 3 },
+        { text: "Ilmu menjadi", target: 4 },
+        { text: "Pergi ke pasar", target: 0 },
+        { text: "Membeli ikan", target: 0 }
+      ],
+      correctFeedback: "Syabas! Kamu berjaya memulihkan manuskrip pantun dengan lengkap!",
+      hint: "Pilih baris yang membawa mesej tentang kepentingan belajar dan ilmu."
+    },
+    {
+      id: 6,
+      title: "Detektif Pola Rima",
+      badge: "Daun Teratai 6",
+      instruction: "Perhatikan bunyi pada hujung setiap baris untuk menemukan pola rima pantun.",
+      pantun: "Burung merpati terbang ke de<strong>sa</strong>,<br>Hinggap sebentar di pohon ja<strong>ti</strong>;<br>Rajin belajar sepanjang ma<strong>sa</strong>,<br>Ilmu menjadi bekal seja<strong>ti</strong>.",
+      type: "mcq",
+      question: "Apakah pola rima akhir pantun tersebut?",
+      options: [
+        { text: "A. AABB", correct: false },
+        { text: "B. ABAB", correct: true },
+        { text: "C. ABCB", correct: false },
+        { text: "D. AAAA", correct: false }
+      ],
+      correctFeedback: "Tepat sekali! Pola rima pantun ini ialah ABAB (desa [A], jati [B], masa [A], sejati [B]).",
+      hint: "Bandingkan hujung baris pertama dengan baris ketiga, kemudian baris kedua dengan baris keempat."
+    },
+    {
+      id: 7,
+      title: "Cari Maksud Pantun",
+      badge: "Daun Teratai 7",
+      instruction: "Baca dua baris terakhir pantun dan pilih mesej yang ingin disampaikan.",
+      pantun: "Rajin belajar sepanjang masa,<br>Ilmu menjadi bekal sejati.",
+      type: "mcq",
+      question: "Apakah maksud dua baris pantun di atas?",
+      options: [
+        { text: "A. Kita hendaklah rajin belajar kerana ilmu berguna dalam kehidupan.", correct: true },
+        { text: "B. Kita perlu pergi ke desa untuk mencari burung merpati.", correct: false },
+        { text: "C. Kita hendaklah mengumpulkan banyak pokok jati.", correct: false },
+        { text: "D. Kita perlu bermain sepanjang hari.", correct: false }
+      ],
+      correctFeedback: "Tepat! Pantun ini menggalakkan kita rajin belajar kerana ilmu menjadi bekalan yang berguna dalam kehidupan.",
+      hint: "Fikirkan mesej tentang usaha belajar dan kepentingan ilmu."
+    },
+    {
+      id: 8,
+      title: "Susun Semula Pantun",
+      badge: "Daun Teratai 8",
+      instruction: "Inilah cabaran terakhir, Detektif Cilik! Susun semula empat baris berikut supaya menjadi pantun yang lengkap.",
+      pantun: "",
+      type: "reorder",
+      initialLines: [
+        "Ilmu menjadi bekal sejati.",
+        "Burung merpati terbang ke desa,",
+        "Rajin belajar sepanjang masa,",
+        "Hinggap sebentar di pohon jati;"
+      ],
+      correctOrder: [
+        "Burung merpati terbang ke desa,",
+        "Hinggap sebentar di pohon jati;",
+        "Rajin belajar sepanjang masa,",
+        "Ilmu menjadi bekal sejati."
+      ],
+      correctFeedback: "TAHNIAH! Kamu berjaya menyusun semula pantun dan membuka laluan ke Peti Pantun Warisan!",
+      hint: "Mulakan dengan dua baris pembayang, kemudian susun dua baris maksud."
+    }
+  ];
+
+  let selectedMulti = [];
+  let selectedLeftMatch = null;
+  let matchesCount = 0;
+  let classificationState = { pembayang: [], maksud: [], unassigned: [1, 2, 3, 4] };
+  let fillState = { 3: null, 4: null };
+  let currentReorder = [];
+
+  function showScreen(screenId) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(screenId).classList.add('active');
+  }
+
+  function startAdventure() {
+    showScreen('screen-map');
+    moveFrogToLeaf(1);
+  }
+
+  function moveFrogToLeaf(levelNum) {
+    const coords = leafCoordinates[levelNum];
+    const frogEl = document.getElementById('frog-character');
+    if (coords && frogEl) {
+      frogEl.style.left = coords.left;
+      frogEl.style.top = coords.top;
+    }
+  }
+
+  function updateHeader() {
+    document.getElementById('score-val').innerText = `${totalScore} / 80`;
+    document.getElementById('progress-count').innerText = `${completedLevels.size} / 8`;
+    const percent = (completedLevels.size / 8) * 100;
+    document.getElementById('progress-fill').style.width = `${percent}%`;
+  }
+
+  function openCurrentChallenge() {
+    openChallenge(currentLevel);
+  }
+
+  function openChallenge(levelNum) {
+    if (levelNum > currentLevel && !completedLevels.has(levelNum)) return;
+    const challenge = challenges.find(c => c.id === levelNum);
+    if (!challenge) return;
+
+    hideFeedback();
+    document.getElementById('btn-next').style.display = 'none';
+    document.getElementById('btn-check').style.display = 'none';
+    setFrogMood('thinking');
+
+    document.getElementById('c-badge').innerText = challenge.badge;
+    document.getElementById('c-title').innerText = challenge.title;
+    document.getElementById('c-instruction').innerText = challenge.instruction;
+
+    const pBox = document.getElementById('c-pantun-box');
+    if (challenge.pantun) {
+      pBox.innerHTML = challenge.pantun;
+      pBox.style.display = 'block';
+    } else {
+      pBox.style.display = 'none';
+    }
+
+    renderChallengeContent(challenge);
+    showScreen('screen-challenge');
+  }
+
+  function renderChallengeContent(c) {
+    const area = document.getElementById('c-interactive-area');
+    area.innerHTML = '';
+
+    if (c.type === 'mcq') {
+      const p = document.createElement('p');
+      p.style.fontWeight = 'bold';
+      p.style.margin = '10px 0';
+      p.innerText = c.question;
+      area.appendChild(p);
+
+      const grid = document.createElement('div');
+      grid.className = 'options-grid';
+      c.options.forEach(opt => {
+        const btn = document.createElement('div');
+        btn.className = 'opt-card';
+        btn.innerText = opt.text;
+        btn.onclick = () => handleMcqChoice(btn, opt.correct, c);
+        grid.appendChild(btn);
+      });
+      area.appendChild(grid);
+    }
+    else if (c.type === 'multi_select') {
+      selectedMulti = [];
+      const p = document.createElement('p');
+      p.style.fontWeight = 'bold';
+      p.style.margin = '10px 0';
+      p.innerText = c.question;
+      area.appendChild(p);
+
+      const grid = document.createElement('div');
+      grid.className = 'options-grid';
+      c.options.forEach(opt => {
+        const card = document.createElement('div');
+        card.className = 'opt-card';
+        card.id = `multi-${opt.id}`;
+        card.innerText = opt.text;
+        card.onclick = () => toggleMultiSelect(card, opt.id);
+        grid.appendChild(card);
+      });
+      area.appendChild(grid);
+      document.getElementById('btn-check').style.display = 'inline-flex';
+    }
+    else if (c.type === 'matching') {
+      matchesCount = 0;
+      selectedLeftMatch = null;
+      const wrap = document.createElement('div');
+      wrap.className = 'bridge-match-container';
+
+      const leftCol = document.createElement('div');
+      leftCol.className = 'match-col';
+      c.leftWords.forEach(w => {
+        const b = document.createElement('button');
+        b.className = 'match-btn';
+        b.id = `match-left-${w}`;
+        b.innerText = w;
+        b.onclick = () => selectMatchLeft(w, b);
+        leftCol.appendChild(b);
+      });
+
+      const rightCol = document.createElement('div');
+      rightCol.className = 'match-col';
+      [...c.rightWords].sort(() => Math.random() - 0.5).forEach(w => {
+        const b = document.createElement('button');
+        b.className = 'match-btn';
+        b.id = `match-right-${w}`;
+        b.innerText = w;
+        b.onclick = () => selectMatchRight(w, b, c);
+        rightCol.appendChild(b);
+      });
+
+      wrap.appendChild(leftCol);
+      wrap.appendChild(rightCol);
+      area.appendChild(wrap);
+    }
+    else if (c.type === 'classify') {
+      classificationState = { pembayang: [], maksud: [], unassigned: [1, 2, 3, 4] };
+      renderClassificationUI(c);
+      document.getElementById('btn-check').style.display = 'inline-flex';
+    }
+    else if (c.type === 'fill_blank') {
+      fillState = { 3: null, 4: null };
+      const choiceBox = document.createElement('div');
+      choiceBox.style.display = 'flex';
+      choiceBox.style.flexWrap = 'wrap';
+      choiceBox.style.gap = '10px';
+      choiceBox.style.margin = '14px 0';
+
+      c.choices.forEach((ch, idx) => {
+        const b = document.createElement('button');
+        b.className = 'btn btn-secondary';
+        b.id = `choice-btn-${idx}`;
+        b.style.padding = '8px 16px';
+        b.style.fontSize = '15px';
+        b.innerText = ch.text;
+        b.onclick = () => assignFillChoice(ch, b, c);
+        choiceBox.appendChild(b);
+      });
+      area.appendChild(choiceBox);
+      document.getElementById('btn-check').style.display = 'inline-flex';
+    }
+    else if (c.type === 'reorder') {
+      currentReorder = [...c.initialLines];
+      renderReorderUI();
+      document.getElementById('btn-check').style.display = 'inline-flex';
+    }
+  }
+
+  function handleMcqChoice(cardEl, isCorrect, c) {
+    if (isCorrect) {
+      cardEl.classList.add('correct');
+      triggerChallengeSuccess(c.correctFeedback);
+    } else {
+      cardEl.classList.add('wrong');
+      triggerChallengeError(c.hint);
+      setTimeout(() => cardEl.classList.remove('wrong'), 1000);
+    }
+  }
+
+  function toggleMultiSelect(el, id) {
+    if (el.classList.contains('selected')) {
+      el.classList.remove('selected');
+      selectedMulti = selectedMulti.filter(item => item !== id);
+    } else {
+      if (selectedMulti.length < 2) {
+        el.classList.add('selected');
+        selectedMulti.push(id);
+      }
+    }
+  }
+
+  function selectMatchLeft(word, btn) {
+    document.querySelectorAll('.match-col:first-child .match-btn').forEach(b => b.classList.remove('active-match'));
+    btn.classList.add('active-match');
+    selectedLeftMatch = word;
+  }
+
+  function selectMatchRight(word, btn, c) {
+    if (!selectedLeftMatch) {
+      triggerChallengeError("Sila pilih perkataan di sebelah kiri dahulu!");
+      return;
+    }
+    if (c.pairs[selectedLeftMatch] === word) {
+      document.getElementById(`match-left-${selectedLeftMatch}`).classList.add('done');
+      btn.classList.add('done');
+      matchesCount++;
+      selectedLeftMatch = null;
+
+      if (matchesCount === 4) {
+        triggerChallengeSuccess(c.correctFeedback);
+      } else {
+        triggerChallengeSuccess(`Padanan betul (${matchesCount}/4)! Teruskan membina jambatan.`);
+        document.getElementById('btn-next').style.display = 'none';
+      }
+    } else {
+      btn.classList.add('wrong');
+      triggerChallengeError(c.hint);
+      setTimeout(() => btn.classList.remove('wrong'), 800);
+    }
+  }
+
+  function renderClassificationUI(c) {
+    const area = document.getElementById('c-interactive-area');
+    area.innerHTML = '';
+    const unassignedZone = document.createElement('div');
+    unassignedZone.style.display = 'flex';
+    unassignedZone.style.flexDirection = 'column';
+    unassignedZone.style.gap = '8px';
+    unassignedZone.style.marginBottom = '12px';
+
+    const p = document.createElement('p');
+    p.style.fontSize = '14px';
+    p.style.fontWeight = 'bold';
+    p.innerText = "Kad untuk dikelaskan (Ketik kad untuk alihkan):";
+    unassignedZone.appendChild(p);
+
+    c.cards.forEach(card => {
+      if (classificationState.unassigned.includes(card.id)) {
+        const item = document.createElement('div');
+        item.className = 'draggable-card';
+        item.innerText = card.text;
+        item.onclick = () => moveCardPrompt(card.id);
+        unassignedZone.appendChild(item);
+      }
+    });
+
+    const grid = document.createElement('div');
+    grid.className = 'classification-zones';
+
+    const z1 = document.createElement('div');
+    z1.className = 'class-zone';
+    z1.innerHTML = '<h4>🌿 Kumpulan 1: PEMBAYANG</h4>';
+    classificationState.pembayang.forEach(id => {
+      const cd = c.cards.find(x => x.id === id);
+      const it = document.createElement('div');
+      it.className = 'draggable-card';
+      it.style.background = '#e2f5ea';
+      it.innerText = cd.text + ' ↩';
+      it.onclick = () => returnCard(id, 'pembayang');
+      z1.appendChild(it);
+    });
+
+    const z2 = document.createElement('div');
+    z2.className = 'class-zone';
+    z2.innerHTML = '<h4>💡 Kumpulan 2: MAKSUD</h4>';
+    classificationState.maksud.forEach(id => {
+      const cd = c.cards.find(x => x.id === id);
+      const it = document.createElement('div');
+      it.className = 'draggable-card';
+      it.style.background = '#fefcbf';
+      it.innerText = cd.text + ' ↩';
+      it.onclick = () => returnCard(id, 'maksud');
+      z2.appendChild(it);
+    });
+
+    grid.appendChild(z1);
+    grid.appendChild(z2);
+    area.appendChild(unassignedZone);
+    area.appendChild(grid);
+  }
+
+  function moveCardPrompt(cardId) {
+    if (classificationState.pembayang.length < 2) {
+      classificationState.pembayang.push(cardId);
+    } else if (classificationState.maksud.length < 2) {
+      classificationState.maksud.push(cardId);
+    } else {
+      triggerChallengeError("Kedua-dua kumpulan sudah mengandungi dua baris.");
+      return;
+    }
+    classificationState.unassigned = classificationState.unassigned.filter(i => i !== cardId);
+    renderClassificationUI(challenges[3]);
+  }
+
+  function returnCard(cardId, fromGroup) {
+    classificationState[fromGroup] = classificationState[fromGroup].filter(i => i !== cardId);
+    classificationState.unassigned.push(cardId);
+    renderClassificationUI(challenges[3]);
+  }
+
+  function assignFillChoice(ch, btn, c) {
+    if (!fillState[3]) {
+      fillState[3] = ch.text;
+      document.getElementById('slot-3').innerText = ch.text;
+      btn.style.display = 'none';
+      btn.dataset.usedIn = '3';
+    } else if (!fillState[4]) {
+      fillState[4] = ch.text;
+      document.getElementById('slot-4').innerText = ch.text;
+      btn.style.display = 'none';
+      btn.dataset.usedIn = '4';
+    } else {
+      triggerChallengeError("Kedua-dua ruang telah diisi.");
+    }
+  }
+
+  function removeFromSlot(slotNum) {
+    if (fillState[slotNum]) {
+      const text = fillState[slotNum];
+      fillState[slotNum] = null;
+      document.getElementById(`slot-${slotNum}`).innerText = `[Tekan Pilihan ${slotNum === 3 ? 1 : 2}]`;
+      document.querySelectorAll('#c-interactive-area button').forEach(b => {
+        if (b.innerText === text) b.style.display = 'inline-flex';
+      });
+    }
+  }
+
+  function renderReorderUI() {
+    const area = document.getElementById('c-interactive-area');
+    area.innerHTML = '';
+    const list = document.createElement('div');
+    list.style.display = 'flex';
+    list.style.flexDirection = 'column';
+    list.style.gap = '8px';
+
+    currentReorder.forEach((line, idx) => {
+      const item = document.createElement('div');
+      item.style.background = 'white';
+      item.style.border = '2px solid #cbd5e0';
+      item.style.borderRadius = '10px';
+      item.style.padding = '10px 14px';
+      item.style.display = 'flex';
+      item.style.justifyContent = 'space-between';
+      item.style.alignItems = 'center';
+
+      const txt = document.createElement('span');
+      txt.style.fontWeight = 'bold';
+      txt.innerText = `${idx + 1}. ${line}`;
+
+      const btns = document.createElement('div');
+      btns.style.display = 'flex';
+      btns.style.gap = '6px';
+
+      if (idx > 0) {
+        const upBtn = document.createElement('button');
+        upBtn.innerText = '▲';
+        upBtn.style.padding = '4px 8px';
+        upBtn.style.cursor = 'pointer';
+        upBtn.onclick = () => moveLine(idx, idx - 1);
+        btns.appendChild(upBtn);
+      }
+      if (idx < currentReorder.length - 1) {
+        const downBtn = document.createElement('button');
+        downBtn.innerText = '▼';
+        downBtn.style.padding = '4px 8px';
+        downBtn.style.cursor = 'pointer';
+        downBtn.onclick = () => moveLine(idx, idx + 1);
+        btns.appendChild(downBtn);
+      }
+      item.appendChild(txt);
+      item.appendChild(btns);
+      list.appendChild(item);
+    });
+    area.appendChild(list);
+  }
+
+  function moveLine(from, to) {
+    const temp = currentReorder[from];
+    currentReorder[from] = currentReorder[to];
+    currentReorder[to] = temp;
+    renderReorderUI();
+  }
+
+  function verifyAnswer() {
+    const c = challenges.find(item => item.id === currentLevel);
+
+    if (c.type === 'multi_select') {
+      if (selectedMulti.length !== 2) {
+        triggerChallengeError("Sila pilih tepat dua baris pembayang.");
+        return;
+      }
+      if (selectedMulti.includes('A') && selectedMulti.includes('C')) {
+        triggerChallengeSuccess(c.correctFeedback);
+      } else {
+        triggerChallengeError(c.hint);
+      }
+    }
+    else if (c.type === 'classify') {
+      const correctPembayang = [1, 2];
+      const correctMaksud = [3, 4];
+      const isPemCorrect = classificationState.pembayang.length === 2 && classificationState.pembayang.every(i => correctPembayang.includes(i));
+      const isMakCorrect = classificationState.maksud.length === 2 && classificationState.maksud.every(i => correctMaksud.includes(i));
+
+      if (isPemCorrect && isMakCorrect) {
+        triggerChallengeSuccess(c.correctFeedback);
+      } else {
+        triggerChallengeError(c.hint);
+      }
+    }
+    else if (c.type === 'fill_blank') {
+      if (fillState[3] === "Rajin belajar" && fillState[4] === "Ilmu menjadi") {
+        triggerChallengeSuccess(c.correctFeedback);
+      } else {
+        triggerChallengeError(c.hint);
+      }
+    }
+    else if (c.type === 'reorder') {
+      const isAllMatch = currentReorder.every((line, idx) => line === c.correctOrder[idx]);
+      if (isAllMatch) {
+        triggerChallengeSuccess(c.correctFeedback);
+      } else {
+        triggerChallengeError(c.hint);
+      }
+    }
+  }
+
+  function triggerChallengeSuccess(message) {
+    const fb = document.getElementById('c-feedback');
+    fb.className = 'feedback-bubble';
+    fb.style.display = 'flex';
+    document.getElementById('fb-icon').innerText = '🌟';
+    document.getElementById('fb-text').innerText = message;
+    setFrogMood('happy');
+
+    document.getElementById('btn-check').style.display = 'none';
+    document.getElementById('btn-next').style.display = 'inline-flex';
+
+    if (!completedLevels.has(currentLevel)) {
+      completedLevels.add(currentLevel);
+      totalScore += 10;
+      updateHeader();
+    }
+  }
+
+  function triggerChallengeError(message) {
+    const fb = document.getElementById('c-feedback');
+    fb.className = 'feedback-bubble error';
+    fb.style.display = 'flex';
+    document.getElementById('fb-icon').innerText = '🤔';
+    document.getElementById('fb-text').innerText = message;
+    setFrogMood('thinking');
+  }
+
+  function hideFeedback() {
+    document.getElementById('c-feedback').style.display = 'none';
+  }
+
+  function setFrogMood(mood) {
+    const frogs = [document.getElementById('c-frog'), document.getElementById('map-frog')];
+    frogs.forEach(frog => {
+      if (!frog) return;
+      frog.className = 'frog-avatar ' + mood;
+    });
+  }
+
+  function completeAndReturn() {
+    const currentLeafEl = document.getElementById(`leaf-${currentLevel}`);
+    if (currentLeafEl) {
+      currentLeafEl.classList.remove('active-leaf');
+      currentLeafEl.classList.add('completed');
+    }
+
+    if (currentLevel < 8) {
+      currentLevel++;
+      const nextLeafEl = document.getElementById(`leaf-${currentLevel}`);
+      if (nextLeafEl) {
+        nextLeafEl.classList.remove('locked');
+        nextLeafEl.classList.add('active-leaf');
+      }
+      showScreen('screen-map');
+      moveFrogToLeaf(currentLevel);
+    } else {
+      showScreen('screen-end');
+      document.getElementById('final-score').innerText = totalScore;
+    }
+  }
+
+  function restartGame() {
+    currentLevel = 1;
+    totalScore = 0;
+    completedLevels.clear();
+
+    for (let i = 1; i <= 8; i++) {
+      const leaf = document.getElementById(`leaf-${i}`);
+      leaf.className = 'lotus-leaf locked';
+    }
+    const leaf1 = document.getElementById('leaf-1');
+    leaf1.className = 'lotus-leaf active-leaf';
+
+    updateHeader();
+    showScreen('screen-home');
+  }
+
+  // FUNGSI INI TELAH DIBETULKAN (TANPA ADA JARAK BARIS PADA PAUTAN)
+  function returnToAdventureMap() {
+    window.location.href = "https://canva.link/kqtzgvxo44tkrsq";
+  }
+
+  updateHeader();
+</script>
+</body>
+</html>
